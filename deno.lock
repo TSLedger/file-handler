@@ -1,0 +1,11 @@
+{
+  "version": "4",
+  "specifiers": {
+    "jsr:@ledger/ledger@0.1.1": "0.1.1"
+  },
+  "jsr": {
+    "@ledger/ledger@0.1.1": {
+      "integrity": "c296d77721361f17a8c25321859aa2cbb4d24ec4309df00d08b136bcd176cdd1"
+    }
+  }
+}
