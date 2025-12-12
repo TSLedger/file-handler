@@ -1,7 +1,20 @@
 {
-  "name": "@ledger/template-handler",
-  "version": "0.0.1",
+  "name": "@ledger/console-handler",
+  "version": "0.0.4",
   "exports": "./mod.ts",
+  "imports": {
+    "ledger": "jsr:@ledger/ledger@0.2.0",
+    "@std/datetime": "jsr:@std/datetime@0.225.5",
+    "@std/fmt": "jsr:@std/fmt@1.0.8",
+    "@std/tar": "jsr:@std/tar@0.1.9",
+    "string.ify": "npm:string.ify@1.0.64",
+    "async": "jsr:@std/async@1.0.15",
+    "expect": "jsr:@std/expect@1.0.17"
+  },
+  "tasks": {
+    "setup": "./dev/setup.sh",
+    "test": "deno check && deno lint && deno fmt --check --ignore=.github && deno test -A"
+  },
   // Compiler Options
   "compilerOptions": {
     "lib": [
