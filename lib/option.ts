@@ -10,6 +10,6 @@ export interface FileHandlerOptions extends HandlerOption {
     fileName: string;
     maxFileCount?: number;
     roughMaxSizeMB?: number;
-    compress?: 'none' | 'tar';
+    compress?: 'none' | 'tar.gz';
   };
 }

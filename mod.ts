@@ -1,3 +1,4 @@
+import { TarStream } from '@std/tar';
 import { type DispatchMessageContext, Level, type ServiceHandlerOption, type WorkerHandler } from 'ledger/struct';
 import type { FileHandlerOptions } from './lib/option.ts';
 import { Mutex } from './lib/util/mutex.ts';
@@ -19,12 +20,10 @@ export class Handler implements WorkerHandler {
 
     // Start Rotation Interval (1 Minute Check)
     setInterval(async () => {
-      console.info('lock mutex interv');
       await this.mutex.acquire();
-      console.info('resolve acq');
       const fstat = await Deno.lstat(this.absolute);
-      console.info('fsize', fstat.size, 'roughMax', (this.options.configured.roughMaxSizeMB ?? 24) * 1024);
-      if (fstat.size >= (this.options.configured.roughMaxSizeMB ?? 24) * 1024) {
+      console.info('fsize', fstat.size / 1024, 'roughMax', (this.options.configured.roughMaxSizeMB ?? 100) * 1024);
+      if ((fstat.size / 1024) >= (this.options.configured.roughMaxSizeMB ?? 100) * 1024) {
         console.info('size exceeded. rotate!');
         let fileList: { name: string; index: number }[] = [];
         for await (const ent of Deno.readDir(new URL(this.options.configured.path))) {
@@ -37,8 +36,7 @@ export class Handler implements WorkerHandler {
               });
               continue;
             }
-            const partial = ent.name.replace(`${this.options.configured.fileName}.`, '').split('.')[0];
-            const index = parseInt(partial ?? '');
+            const index = parseInt(ent.name.replace(`${this.options.configured.fileName}.`, '').replace('.tar', '').split('.')[0] ?? '');
             if (isNaN(index)) continue;
             fileList.push({
               name: ent.name,
@@ -47,11 +45,26 @@ export class Handler implements WorkerHandler {
           }
         }
         fileList = fileList.sort((a, b) => b.index - a.index);
-        console.info(fileList);
+
+        for (const file of fileList) {
+          const oldPath = new URL(file.name, this.options.configured.path);
+          if (file.index + 1 >= (this.options.configured.maxFileCount ?? 5)) {
+            // Remove File Exceeding Max Count
+            await Deno.remove(oldPath);
+            console.info('removed', oldPath.href);
+          } else {
+            const newPath = new URL(`${this.options.configured.fileName}.${file.index + 1}`, this.options.configured.path);
+            await Deno.rename(oldPath, newPath);
+            console.info('renamed', oldPath.href, 'to', newPath.href);
+            if (this.options.configured.compress === 'tar.gz') {
+              // TODO:  Use Usage Docs of TarStream to create tar.gz compressed file
+              new TarStream();
+            }
+          }
+        }
       }
-      console.info('release mutex interv');
       this.mutex.release();
-    }, 15 * 1000);
+    }, 3 * 1000);
   }
 
   public async receive({ context }: DispatchMessageContext): Promise<void> {
@@ -99,8 +112,5 @@ class IFHandler {
 
   public async write(): Promise<void> {
     await Deno.writeTextFile(this.absolute, `${crypto.randomUUID()}\n`, { append: true, create: true });
-  }
-
-  public async rotate(): Promise<void> {
   }
 }

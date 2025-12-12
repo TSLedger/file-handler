@@ -10,6 +10,8 @@
     "jsr:@std/fmt@1.0.8": "1.0.8",
     "jsr:@std/internal@^1.0.10": "1.0.12",
     "jsr:@std/internal@^1.0.12": "1.0.12",
+    "jsr:@std/streams@^1.0.13": "1.0.14",
+    "jsr:@std/tar@0.1.9": "0.1.9",
     "npm:string.ify@1.0.64": "1.0.64"
   },
   "jsr": {
@@ -46,6 +48,15 @@
     },
     "@std/internal@1.0.12": {
       "integrity": "972a634fd5bc34b242024402972cd5143eac68d8dffaca5eaa4dba30ce17b027"
+    },
+    "@std/streams@1.0.14": {
+      "integrity": "c0df6cdd73bd4bbcbe4baa89e323b88418c90ceb2d926f95aa99bdcdbfca2411"
+    },
+    "@std/tar@0.1.9": {
+      "integrity": "9d684ddfbe66db61ade4b717e3b2519e3b09c7697f28edef2bef798d8d9083ba",
+      "dependencies": [
+        "jsr:@std/streams"
+      ]
     }
   },
   "npm": {
@@ -73,6 +84,7 @@
       "jsr:@std/datetime@0.225.5",
       "jsr:@std/expect@1.0.17",
       "jsr:@std/fmt@1.0.8",
+      "jsr:@std/tar@0.1.9",
       "npm:string.ify@1.0.64"
     ]
   }

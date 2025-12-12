@@ -1,5 +1,6 @@
-import { FileHandlerOptions } from './lib/option.ts';
-im
+import { Ledger } from 'ledger';
+import { Level } from 'ledger/struct';
+import type { FileHandlerOptions } from './lib/option.ts';
 
 let ledger: Ledger | null = null;
 ledger = new Ledger({
@@ -14,10 +15,11 @@ ledger.register<FileHandlerOptions>({
     path: new URL('./tmp/', import.meta.url).href,
     fileName: 'ledger.log',
     roughMaxSizeMB: 1,
+    maxFileCount: 5,
   },
 });
 await ledger.alive();
 
 setInterval(() => {
   ledger.information('test');
-}, 100);
+}, 3);
