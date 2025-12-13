@@ -16,10 +16,14 @@ ledger.register<FileHandlerOptions>({
     fileName: 'ledger.log',
     roughMaxSizeMB: 1,
     maxFileCount: 5,
+    compress: 'tar.gz',
   },
 });
 await ledger.alive();
+console.info('alive!');
 
-setInterval(() => {
-  ledger.information('test');
-}, 3);
+const fn = () => {
+  ledger.information('Test Message', { foo: 'bar', baz: [1, 2, 3], err: new Error('Sample Error for Testing') });
+  setTimeout(fn, 1);
+};
+fn();
