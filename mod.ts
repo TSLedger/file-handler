@@ -85,7 +85,7 @@ export class Handler implements WorkerHandler {
           append: true,
         })).writable.getWriter();
       }, 100);
-    }, 5 * 1000);
+    }, 60000);
   }
 
   public async receive({ context }: DispatchMessageContext): Promise<void> {
