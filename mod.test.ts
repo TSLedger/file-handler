@@ -1,5 +1,5 @@
-import type { FileHandlerOptions } from '@ledger/console-handler/options';
 import { Ledger } from 'ledger';
+import type { FileHandlerOptions } from './lib/option.ts';
 
 let ledger: Ledger;
 
