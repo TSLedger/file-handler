@@ -99,7 +99,7 @@ export class Handler implements WorkerHandler {
           append: true,
         })).writable.getWriter();
       }, 100);
-    }, 60000);
+    }, (this.options.configured.fileSizePollRate ?? 15) * 1000);
   }
 
   public async receive({ context }: DispatchMessageContext): Promise<void> {
