@@ -10,6 +10,8 @@ permissions:
   attestations: write
   checks: write
   contents: write
+  discussions: write
+  id-token: write
 
 jobs:
   candidate:
