@@ -1,4 +1,4 @@
-import { FileHandlerOptions } from '@ledger/console-handler/options';
+import type { FileHandlerOptions } from '@ledger/console-handler/options';
 import { Ledger } from 'ledger';
 
 let ledger: Ledger;
