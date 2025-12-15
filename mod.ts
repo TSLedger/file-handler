@@ -17,6 +17,8 @@ export class Handler implements WorkerHandler {
     this.options = options as FileHandlerOptions & ServiceHandlerOption;
 
     // Set Handler and Rotation Options
+    console.info('[Ledger/FileHandler] Initializing File Handler with Options:', this.options);
+    Deno.mkdirSync(new URL(this.options.configured.path), { recursive: true });
     this.absolute = new URL(this.options.configured.fileName, this.options.configured.path);
     this.writer = Deno.openSync(this.absolute, {
       write: true,

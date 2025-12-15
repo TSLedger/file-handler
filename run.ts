@@ -7,6 +7,7 @@ ledger = new Ledger({
   service: 'test-suite',
   useAsyncDispatchQueue: true,
   troubleshooting: true,
+  troubleshootingIPC: false,
 });
 ledger.register<FileHandlerOptions>({
   definition: new URL('./mod.ts', import.meta.url).href,
@@ -20,7 +21,6 @@ ledger.register<FileHandlerOptions>({
   },
 });
 await ledger.alive();
-console.info('alive!');
 
 const fn = () => {
   ledger.information('Test Message', { foo: 'bar', baz: [1, 2, 3], err: new Error('Sample Error for Testing') });

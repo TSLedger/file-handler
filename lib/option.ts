@@ -1,6 +1,6 @@
-import type { HandlerOption, Level } from 'ledger/struct';
+import type { Level } from 'ledger/struct';
 
-export interface FileHandlerOptions extends HandlerOption {
+export interface FileHandlerOptions {
   /** If level is less than or equal to this specified level, the even will be logged. */
   level?: Level;
 
