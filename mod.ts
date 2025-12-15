@@ -1,24 +1,36 @@
 import { format } from '@std/datetime/format';
 import { TarStream, type TarStreamInput } from '@std/tar/tar-stream';
 import { Mutex } from 'async-mutex';
-import { type DispatchMessageContext, Level, type ServiceHandlerOption, type WorkerHandler } from 'ledger/struct';
+import { NJSON } from 'next-json';
+
+import { type DispatchMessageContext, type LedgerErrorMessageContext, Level, Operation, type ServiceHandlerOption, type WorkerHandler } from 'ledger/struct';
 import type { FileHandlerOptions } from './lib/option.ts';
-import { serialize } from './lib/util.ts';
 
 /** Handler Exported Class. */
 export class Handler implements WorkerHandler {
   private readonly mutex = new Mutex();
   private readonly options: FileHandlerOptions & ServiceHandlerOption;
 
-  private writer: WritableStreamDefaultWriter<Uint8Array<ArrayBufferLike>>;
-  private readonly absolute: URL;
+  private writer: WritableStreamDefaultWriter<Uint8Array<ArrayBufferLike>> | null = null;
+  private readonly absolute: URL | null = null;
 
   public constructor(options: ServiceHandlerOption) {
     this.options = options as FileHandlerOptions & ServiceHandlerOption;
 
     // Set Handler and Rotation Options
-    console.info('[Ledger/FileHandler] Initializing File Handler with Options:', this.options);
-    Deno.mkdirSync(new URL(this.options.configured.path), { recursive: true });
+    try {
+      Deno.mkdirSync(new URL(this.options.configured.path), { recursive: true });
+    } catch (e) {
+      if (!(e instanceof Error)) return;
+      self.postMessage({
+        operation: Operation.LEDGER_ERROR,
+        context: {
+          message: `Unable to mkdirSync on "${this.options.configured.path}". InitializeWorkerHandlerFailed`,
+          stack: e.stack,
+        },
+      } as LedgerErrorMessageContext);
+      throw new Error('InitializeWorkerHandlerFailed');
+    }
     this.absolute = new URL(this.options.configured.fileName, this.options.configured.path);
     this.writer = Deno.openSync(this.absolute, {
       write: true,
@@ -29,9 +41,9 @@ export class Handler implements WorkerHandler {
     // Start Rotation Interval (1 Minute Check)
     setInterval(async () => {
       await this.mutex.runExclusive(async () => {
-        const fstat = await Deno.lstat(this.absolute);
+        const fstat = await Deno.lstat(this.absolute!);
         if ((fstat.size / 1024) >= (this.options.configured.roughMaxSizeMB ?? 100) * 1024) {
-          await this.writer.close();
+          await this.writer?.close();
 
           let fileList: { name: string; index: number }[] = [];
           for await (const ent of Deno.readDir(new URL(this.options.configured.path))) {
@@ -44,7 +56,7 @@ export class Handler implements WorkerHandler {
                 });
                 continue;
               }
-              const index = parseInt(ent.name.replace(`${this.options.configured.fileName}.`, '').replace('.tar', '').split('.')[0] ?? '');
+              const index = parseInt(ent.name.replace(`${this.options.configured.fileName}.`, '').replace('.tar.gz', '').split('.')[0] ?? '');
               if (isNaN(index)) continue;
               fileList.push({
                 name: ent.name,
@@ -81,7 +93,7 @@ export class Handler implements WorkerHandler {
           }
         }
 
-        this.writer = (await Deno.open(this.absolute, {
+        this.writer = (await Deno.open(this.absolute!, {
           write: true,
           create: true,
           append: true,
@@ -96,42 +108,35 @@ export class Handler implements WorkerHandler {
       return;
     }
 
-    // Message
-    const level = Level[context.level];
-    let message = context.q ?? '';
-    if (message instanceof Error) {
-      message = message.stack ?? message.message;
-    } else {
-      message = serialize(message);
-    }
-
-    // Arguments
-    let args = serialize(context.args);
-    if (args.trim() === '[]') args = '';
-
     // Variables
-    const content: Record<string, string> = {
+    const struct: Record<string, unknown> = {
       timestamp: format(context.date, 'yyyy-MM-dd HH:mm:ss.SSS'),
       service: this.options.service,
-      level,
-      message: message,
-      args: args,
+      level: Level[context.level],
+      message: context.q,
+      args: context.args,
     };
 
     // Await Mutex
     const release = await this.mutex.acquire(1);
 
     try {
-      this.write(serialize(content));
+      this.write(NJSON.stringify(struct));
     } catch (e: unknown) {
-      // deno-lint-ignore no-console
-      console.error('[Ledger/FileHandler] File Write Error:', content, e);
+      if (!(e instanceof Error)) return;
+      self.postMessage({
+        operation: Operation.LEDGER_ERROR,
+        context: {
+          message: 'Failed to Write to FileHandle.',
+          stack: e.stack,
+        },
+      } as LedgerErrorMessageContext);
       release();
     }
     release();
   }
 
   private async write(text: string): Promise<void> {
-    await this.writer.write(new TextEncoder().encode([text, '\n'].join('')));
+    await this.writer!.write(new TextEncoder().encode([text, '\n'].join('')));
   }
 }
