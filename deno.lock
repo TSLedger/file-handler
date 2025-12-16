@@ -2,7 +2,7 @@
   "version": "5",
   "specifiers": {
     "jsr:@cm-iv/queue@1.0.0": "1.0.0",
-    "jsr:@ledger/ledger@0.3.5": "0.3.5",
+    "jsr:@ledger/ledger@0.3.7": "0.3.7",
     "jsr:@std/assert@^1.0.14": "1.0.16",
     "jsr:@std/async@1.0.15": "1.0.15",
     "jsr:@std/datetime@0.225.5": "0.225.5",
@@ -19,8 +19,8 @@
     "@cm-iv/queue@1.0.0": {
       "integrity": "0dc1da37987077e765240a73f7164196fca065ce585fcb542f8db50831078f0a"
     },
-    "@ledger/ledger@0.3.5": {
-      "integrity": "a9e9463d86e01d44c656c36ebf283f7b55bf60ba43aa767e83310f2428f85dc8",
+    "@ledger/ledger@0.3.7": {
+      "integrity": "2239dba9f7cef01dbb1ffc32ad98ad47fac1d4aa8051b25a04055b87488ebce7",
       "dependencies": [
         "jsr:@cm-iv/queue"
       ]
@@ -76,7 +76,7 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@ledger/ledger@0.3.5",
+      "jsr:@ledger/ledger@0.3.7",
       "jsr:@std/async@1.0.15",
       "jsr:@std/datetime@0.225.5",
       "jsr:@std/expect@1.0.17",

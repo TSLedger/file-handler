@@ -103,11 +103,6 @@ export class Handler implements WorkerHandler {
   }
 
   public async receive({ context }: DispatchMessageContext): Promise<void> {
-    // Filter Level
-    if (!(context.level >= (this.options.level ?? Level.TRACE))) {
-      return;
-    }
-
     // Variables
     const struct: Record<string, unknown> = {
       timestamp: format(context.date, 'yyyy-MM-dd HH:mm:ss.SSS'),
