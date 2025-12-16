@@ -1,4 +1,5 @@
 import { Ledger } from 'ledger';
+import { Level } from 'ledger/struct';
 import type { FileHandlerOptions } from './lib/option.ts';
 
 let ledger: Ledger;
@@ -13,6 +14,7 @@ Deno.test('Runtime Definition Test', async (kit) => {
     });
     ledger.register<FileHandlerOptions>({
       definition: new URL('./mod.ts', import.meta.url).href,
+      level: Level.WARNING,
       configured: {
         path: new URL('./ledger/', import.meta.url).href,
         fileName: 'ledger.log',

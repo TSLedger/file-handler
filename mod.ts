@@ -104,7 +104,7 @@ export class Handler implements WorkerHandler {
 
   public async receive({ context }: DispatchMessageContext): Promise<void> {
     // Filter Level
-    if (!(context.level <= (this.options.level ?? Level.LEDGER_ERROR))) {
+    if (!(context.level >= (this.options.level ?? Level.TRACE))) {
       return;
     }
 
