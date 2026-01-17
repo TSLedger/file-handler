@@ -6,7 +6,7 @@ let spCode: number;
 let spStdout: string;
 let spStderr: string;
 
-Deno.test('Ledger - Console Handler Runtime Report', async (kit) => {
+Deno.test('Ledger - File Handler Runtime Report', async (kit) => {
   await kit.step('Dispatch Process', async () => {
     const command = new Deno.Command(Deno.execPath(), {
       args: ['run', '--allow-all', './test/mock-runtime.ts'],
