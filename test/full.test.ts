@@ -20,7 +20,7 @@ Deno.test('Ledger - Console Handler Runtime Report', async (kit) => {
     spStdout = decoder.decode(stdout);
     spStderr = decoder.decode(stderr);
   });
-  await kit.step('Verify Process Output Expectations', async () => {
+  await kit.step('Verify Process Output Expectations', () => {
     assertEquals(spCode, 0);
     assertEquals(spStdout.length, 0);
     assertEquals(spStderr.length, 0);
@@ -34,9 +34,10 @@ Deno.test('Ledger - Console Handler Runtime Report', async (kit) => {
     const stream = ReadableStream.from<TarStreamEntry>(tgzfile.readable.pipeThrough(new DecompressionStream('gzip')).pipeThrough(new UntarStream()));
     for await (const entry of stream) {
       assertEquals(entry.header.size, 2177406);
+      const file = await Deno.open(new URL('./tmp/mock-runtime.test-extract.log', import.meta.url), { read: true, write: true, create: true, truncate: true });
+      await entry.readable?.pipeTo(file.writable);
       break;
     }
-    tgzfile.close();
 
     // Read Current File
     const spfile = await Deno.readTextFile(new URL('./tmp/mock-runtime.log', import.meta.url));
