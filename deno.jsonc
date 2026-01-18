@@ -1,9 +1,8 @@
 {
   "name": "@ledger/file-handler",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "exports": {
-    ".": "./mod.ts",
-    "./options": "./lib/option.ts"
+    ".": "./mod.ts"
   },
   "imports": {
     "ledger": "jsr:@ledger/ledger@0.3.7",

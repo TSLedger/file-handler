@@ -135,3 +135,5 @@ export class Handler implements WorkerHandler {
     await this.writer!.write(new TextEncoder().encode([text, '\n'].join('')));
   }
 }
+
+export type { FileHandlerOptions };

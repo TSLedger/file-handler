@@ -1,6 +1,6 @@
-import type { FileHandlerOptions } from '@ledger/file-handler/options';
 import { Ledger } from 'ledger';
 import { Level } from 'ledger/struct';
+import type { FileHandlerOptions } from '../lib/option.ts';
 
 const ledger = new Ledger({
   service: 'Test IPC Service',
